@@ -21,7 +21,7 @@ def MetricasPorModulo(project_dir):
     # Almacenando resultados de Radon por modulo
     metricas_modulos = []
 
-    # Clase ModuleMetrics que contiene todo lo que puede obtener Radon por archivo
+    # Clase ModuleMetrics que contiene todas las métricas lo que puede obtener Radon por archivo
     class ModuleMetrics:
         def __init__(self, file_name, raw_metrics, halstead, cc, mi, mi_params):
             self.file_name = file_name
