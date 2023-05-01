@@ -14,6 +14,6 @@ def test(project_dir):
                 python_files.append(os.path.join(root, file))
 
     for file_name in python_files:
-        # Lee el contenido del archivo de Python
+        # Ejecutando pylint para cada archivo (configuración default por ahora)
         pylint_opts = ['--disable=line-too-long', file_name]
         pylint.lint.Run(pylint_opts)
