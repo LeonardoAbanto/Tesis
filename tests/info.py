@@ -1,7 +1,7 @@
 import os
 import radon
 import radon.raw
-from app import metricas_radon
+from src import metricas_radon
 def InformacionBasica (project_dir):
     # Lista para almacenar los nombres de los archivos Python
     python_files = []

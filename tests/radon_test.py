@@ -1,4 +1,4 @@
-from app import metricas_radon
+from src import metricas_radon
 
 project_dir = 'C:\\Users\\leona\\Desktop\\TESIS\\ProyectosPython\\eli5-master'
 print(project_dir)
