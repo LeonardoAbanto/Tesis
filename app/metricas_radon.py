@@ -78,8 +78,8 @@ def MetricasProyecto(metricas_modulos):
     ave_hv = hv_t/total_files
     ave_pcmt = pcmt/total_files
 
-    mi = radon.metrics.mi_compute(ave_hv,ave_cc,ave_lloc,ave_pcmt)
+    mi = radon.metrics.mi_compute(ave_hv, ave_cc, ave_lloc, ave_pcmt)
+
     Resultado = namedtuple('Resultado', ['mi', 'total_files', 'total_cc', 'total_sloc', 'total_cmt'])
-    # return {"ave_cc":ave_cc, "ave_hv":ave_hv, "ave_lloc":ave_lloc, "ave_cmt":ave_pcmt, "mi":mi, "total_files":total_files, "total_cc": cc, "total_sloc":sloc, "total_cmt":cmt, "lloc":lloc}
     return Resultado(mi, total_files, cc, sloc, cmt)
 

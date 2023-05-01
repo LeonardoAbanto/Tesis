@@ -1,6 +1,6 @@
 from app import metricas_radon
 
-project_dir = 'C:\\Users\\leona\\Desktop\\TESIS\\ProyectosPython\\pyyaml-master'
+project_dir = 'C:\\Users\\leona\\Desktop\\TESIS\\ProyectosPython\\eli5-master'
 print(project_dir)
 
 metricas_por_modulo = metricas_radon.MetricasPorModulo(project_dir)
@@ -11,8 +11,10 @@ print("Información básica: " + str(informacion_basica))
 print(metricas_proyecto.mi)
 
 for modulo in metricas_por_modulo:
-    print(modulo.file_name)
-    print(modulo.mi)
+    print("Archivo: " + str(modulo.file_name) + " MI: " + str(modulo.mi))
+    print(modulo.raw_metrics)
+    print(modulo.mi_params)
+    print("")
 
 # archivo = 5
 # print(metricas_por_modulo[archivo].file_name)
@@ -21,4 +23,3 @@ for modulo in metricas_por_modulo:
 # print(type(metricas_por_modulo[archivo].cc))
 # print(type(metricas_por_modulo[archivo].mi))
 # print(metricas_por_modulo[5].mi_params)
-

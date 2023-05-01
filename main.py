@@ -13,3 +13,6 @@ informacion_basica = {"sloc": metricas_proyecto.total_sloc, "files": metricas_pr
 
 print(informacion_basica)
 print(metricas_proyecto)
+
+# Indicadores por proyecto a considerar:
+# MI, Duplicacion, Interdependencia, CC (metodos / clases), SLOC, Archivos, AC/EC, DIT, Lack of Cohesion,
