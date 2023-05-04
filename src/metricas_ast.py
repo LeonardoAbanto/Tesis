@@ -25,3 +25,8 @@ def test(project_dir):
             if isinstance(node, ast.FunctionDef):
                 print(f"Nombre de la función: {node.name}")
                 print(f"Número de líneas de la función: {node.body[-1].lineno - node.body[0].lineno + 1}")
+                print(node.args.lineno)
+                print(node.returns)
+            elif isinstance(node, ast.ClassDef):
+                print(f"Nombre de la clase: {node.name}")
+                print(f"Número de líneas de la clase: {node.body[-1].lineno - node.body[0].lineno + 1}")

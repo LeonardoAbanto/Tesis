@@ -1,10 +1,13 @@
 import os
+from collections import namedtuple
+
 # Radon
 # https://radon.readthedocs.io/en/latest/api.html#radon.metrics.mi_visit
 # https://radon.readthedocs.io/en/latest/intro.html
 import radon
-import radon.raw, radon.complexity, radon.metrics
-from collections import namedtuple
+import radon.complexity
+import radon.metrics
+import radon.raw
 
 
 def MetricasPorModulo(project_dir):
