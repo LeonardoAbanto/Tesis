@@ -15,5 +15,13 @@ def test(project_dir):
 
     for file_name in python_files:
         # Ejecutando pylint para cada archivo (configuración default por ahora)
-        pylint_opts = ['--disable=line-too-long', file_name]
-        pylint.lint.Run(pylint_opts)
+
+        # pylint_opts = ['--disable=line-too-long', file_name]
+        # pylint.lint.Run(pylint_opts)
+
+        results = pylint.lint.Run(['--disable=all --enable=duplicate-code', file_name])
+        for message in results.linter.stats['duplicated_lines']:
+            print(f'Fragmento duplicado encontrado: {message}')
+
+
+test('C:\\Users\\leona\\Desktop\\TESIS\\ProyectosPython\\dateparser-master')

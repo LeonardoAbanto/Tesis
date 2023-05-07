@@ -10,6 +10,7 @@ import radon.metrics
 import radon.raw
 
 
+# Extracción de métricas utilizando la librería de análisis estático Radon
 def MetricasPorModulo(project_dir):
 
     # Lista para almacenar los nombres de los archivos Python
@@ -76,7 +77,7 @@ def MetricasProyecto(metricas_modulos):
         lloc += modulo.mi_params[2]
         pcmt += modulo.mi_params[3]
 
-    # Obtiene promedios para calcular MI del proyecto (Oman y Hagemeister, 1994)
+    # Obtiene promedios para calcular MI del proyecto (según Oman y Hagemeister, 1994)
     ave_lloc = lloc/total_files
     ave_cc = cc/total_files
     ave_hv = hv_t/total_files

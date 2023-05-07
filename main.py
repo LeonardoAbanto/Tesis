@@ -16,6 +16,7 @@ def ReporteTD(i):
 
     # Información básica:
     print('Lineas de código: ', radon_proyecto.total_sloc, ' / Archivos: ', radon_proyecto.total_files)
+    print('% de comentarios: ', "%.2f%%" % (100 * radon_proyecto.total_cmt/radon_proyecto.total_sloc))
 
     # MI:
     print()
