@@ -17,6 +17,8 @@ class MetricCounter(ast.NodeVisitor):
         self.classes = []
         self.exceptions = 0
         self.empty_exceptions = 0
+        self.long_expressions = []
+
 
     def visit_FunctionDef(self, node):
         self.functions.append({
@@ -81,6 +83,11 @@ class MetricCounter(ast.NodeVisitor):
         self.classes.append(class_dict)
         self.generic_visit(node)
 
+    def visit_Expr(self, node):
+        line_length = len(node.__repr__())
+        if line_length > 80:
+            self.long_expressions.append((node.lineno, line_length))
+        self.generic_visit(node)
 
 def count_metrics(file_path):
     with open(file_path, 'r') as f:
@@ -102,6 +109,10 @@ def count_metrics(file_path):
         print(f"La clase '{cls['name']}' tiene los siguientes métodos:")
         for mtd in cls['methods_list']:
             print(f"El método '{mtd['name']}' tiene '{mtd['total_lines']}' líneas de código")
+
+    for expr in counter.long_expressions:
+        print(
+            f"La expresión en la línea {expr['lineno']} tiene más de 80 caracteres ({len(expr['code'])} caracteres encontrados)")
 
     print(f"{counter.loops} loops encontrados")
     print(f"{counter.conditionals} condicionales encontrados")
