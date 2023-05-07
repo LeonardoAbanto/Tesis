@@ -1,50 +1,116 @@
 import ast
-import os
-import astor
 
 
-def test(project_dir):
-    # Lista para almacenar los nombres de los archivos Python
-    python_files = []
-
-    # Recorremos el directorio y almacenamos los nombres de los archivos Python
-    for root, dirs, files in os.walk(project_dir):
-        for file in files:
-            if file.endswith('.py'):
-                python_files.append(os.path.join(root, file))
-
-    for file_name in python_files:
-        # Lee el contenido del archivo de Python
-        print(file_name)
-        with open(file_name, 'r', encoding='utf-8') as f:
-            source_code = f.read()
-
-        # Analiza el código fuente en un árbol de sintaxis abstracta (AST)
-        ast_tree = ast.parse(source_code)
-
-        # Recorre el árbol de sintaxis abstracta (AST) en busca de definiciones de funciones
-        for node in ast.walk(ast_tree):
-            if isinstance(node, ast.FunctionDef):
-                print(f"Nombre de la función: {node.name}")
-                print(f"Número de líneas de la función: {node.body[-1].lineno - node.body[0].lineno + 1}")
-            elif isinstance(node, ast.ClassDef):
-                print(f"Nombre de la clase: {node.name}")
-                print(f"Número de líneas de la clase: {node.body[-1].lineno - node.body[0].lineno + 1}")
+class MetricCounter(ast.NodeVisitor):
+    def __init__(self):
+        self.loops = 0
+        self.conditionals = 0
+        self.functions = []
+        self.classes = []
+        self.exceptions = 0
+        self.empty_exceptions = 0
+        self.long_expressions = []
 
 
-def test_astor(project_dir):
-    # Lista para almacenar los nombres de los archivos Python
-    python_files = []
+    def visit_FunctionDef(self, node):
+        self.functions.append({
+            'name': node.name,
+            'lineno': node.lineno,
+            'params': [arg.arg for arg in node.args.args],
+            'total_lines': node.end_lineno - node.lineno + 1
+        })
+        self.generic_visit(node)
 
-    # Recorremos el directorio y almacenamos los nombres de los archivos Python
-    for root, dirs, files in os.walk(project_dir):
-        for file in files:
-            if file.endswith('.py'):
-                python_files.append(os.path.join(root, file))
+    def visit_For(self, node):
+        self.loops += 1
+        self.generic_visit(node)
 
-    for file_name in python_files:
-        print(file_name)
-        astor.parse_file(file_name)
-        with open(file_name, 'r', encoding='utf-8') as f:
-            source_code = f.read()
-        astor.dump_tree()
+    def visit_While(self, node):
+        self.loops += 1
+        self.generic_visit(node)
+
+    def visit_If(self, node):
+        self.conditionals += 1
+        self.generic_visit(node)
+
+    def visit_IfExp(self, node):
+        self.conditionals += 1
+        self.generic_visit(node)
+
+    def visit_Try(self, node):
+        self.exceptions += 1
+        self.generic_visit(node)
+
+    def visit_TryFinally(self, node):
+        self.exceptions += 1
+        self.generic_visit(node)
+
+    def visit_TryExcept(self, node):
+        self.exceptions += 1
+        if not node.body:
+            self.empty_exceptions += 1
+        self.generic_visit(node)
+
+    def visit_ClassDef(self, node):
+        class_dict = {
+            'name': node.name,
+            'lineno': node.lineno,
+            'methods': 0,
+            'methods_list': [],
+            'attributes': 0,
+            'total_lines': node.end_lineno - node.lineno + 1
+        }
+
+        for item in node.body:
+            if isinstance(item, ast.FunctionDef):
+                class_dict['methods'] += 1
+                method_dict = {
+                    'name': item.name,
+                    'total_lines': item.end_lineno - item.lineno + 1
+                }
+                class_dict['methods_list'].append(method_dict)
+            elif isinstance(item, ast.Assign):
+                class_dict['attributes'] += 1
+
+        self.classes.append(class_dict)
+        self.generic_visit(node)
+
+    def visit_Expr(self, node):
+        line_length = len(node.__repr__())
+        if line_length > 80:
+            self.long_expressions.append((node.lineno, line_length))
+        self.generic_visit(node)
+
+def count_metrics(file_path):
+    with open(file_path, 'r') as f:
+        code = f.read()
+
+    tree = ast.parse(code)
+    counter = MetricCounter()
+    counter.visit(tree)
+
+    for func in counter.functions:
+        if len(func['params']) > 2:
+            print(
+                f"La función '{func['name']}' en la línea {func['lineno']} tiene más de 2 parámetros: {func['params']}")
+
+    for cls in counter.classes:
+        print(
+            f"La clase '{cls['name']}' en la línea {cls['lineno']} tiene {cls['methods']} métodos, {cls['attributes']} "
+            f"atributos y {cls['total_lines']} líneas de código")
+        print(f"La clase '{cls['name']}' tiene los siguientes métodos:")
+        for mtd in cls['methods_list']:
+            print(f"El método '{mtd['name']}' tiene '{mtd['total_lines']}' líneas de código")
+
+    for expr in counter.long_expressions:
+        print(
+            f"La expresión en la línea {expr['lineno']} tiene más de 80 caracteres ({len(expr['code'])} caracteres encontrados)")
+
+    print(f"{counter.loops} loops encontrados")
+    print(f"{counter.conditionals} condicionales encontrados")
+    print(f"{len(counter.functions)} funciones encontradas")
+    print(f"{len(counter.classes)} clases encontradas")
+    print(f"{counter.exceptions} cláusulas de excepción encontradas")
+    print(f"{counter.empty_exceptions} cláusulas de excepción vacias")
+
+
