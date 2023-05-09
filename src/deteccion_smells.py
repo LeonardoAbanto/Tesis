@@ -25,28 +25,17 @@ def detectar_smells(file):
     detectar_LEC(visited)
     detectar_LTCE(visited)
 
-
-    for cls in visited.classes:
-        print(
-            f"La clase '{cls['name']}' en la línea {cls['lineno']} tiene {cls['methods']} métodos, {cls['attributes']} "
-            f"atributos y {cls['total_lines']} líneas de código")
-        print(f"La clase '{cls['name']}' tiene los siguientes métodos:")
-        for mtd in cls['methods_list']:
-            print(f"El método '{mtd['name']}' tiene '{mtd['total_lines']}' líneas de código")
-
-
-    print(f"{visited.loops} loops encontrados")
-    print(f"{visited.conditionals} condicionales encontrados")
-    print(f"{len(visited.functions)} funciones encontradas")
-    print(f"{len(visited.classes)} clases encontradas")
-    print(f"{visited.exceptions} cláusulas de excepción encontradas")
-    print(f"{visited.empty_exceptions} cláusulas de excepción vacias")
+    #
+    # print(f"{visited.loops} loops encontrados")
+    # print(f"{visited.conditionals} condicionales encontrados")
+    # print(f"{visited.exceptions} cláusulas de excepción encontradas")
+    # print(f"{visited.empty_exceptions} cláusulas de excepción vacias")
 
 
 def detectar_LC(visited: metricas_ast.MetricVisitor):
     # Long Class: LOC >= 200 o #Métodos + # Atributos > 40
     for cls in visited.classes:
-        if cls['lineno'] >= 200:
+        if cls['total_lines'] >= 200:
             print(
                 f"Code Smell: Clase Larga - "
                 f"La clase '{cls['name']}' en la línea {cls['lineno']} tiene {cls['total_lines']} líneas de código")
@@ -73,7 +62,7 @@ def detectar_LM(visited: metricas_ast.MetricVisitor):
             print(
                 f"Code Smell: Método Largo - "
                 f"El método '{func['name']}' en la línea {func['lineno']} tiene más de 100 líneas de código:"
-                f" {func['lineno']} líneas")
+                f" {func['total_lines']} líneas")
 
 
 def detectar_LMC(visited: metricas_ast.MetricVisitor):
