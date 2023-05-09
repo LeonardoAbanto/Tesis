@@ -49,4 +49,6 @@ def ReporteTD(i):
                 archivos.append(os.path.join(root, file))
 
     for file in archivos:
+        print("Análisis de archivo: ", file)
         deteccion_smells.detectar_smells(file)
+        print()
