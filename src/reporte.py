@@ -1,7 +1,7 @@
 import os
-
 from src import metricas_radon
 from src import deteccion_smells
+
 
 def ReporteTD(i):
     # Ruta del directorio del proyecto
@@ -28,16 +28,15 @@ def ReporteTD(i):
 
     # Módulos con bajo MI
     print()
-    encontrado = False
+    low_mi_encontrado = False
     print('Módulos con baja mantenibilidad:')
     for modulo in radon_por_modulo:
         if 20 > modulo.mi > 0:
             print(modulo.file_name, ' - MI: ', str(modulo.mi))
-            encontrado = True
-    if not encontrado:
+            low_mi_encontrado = True
+    if not low_mi_encontrado:
         print('--')
 
-    print()
     # Indicadores por proyecto a considerar:
     # MI, Duplicacion, Interdependencia, CC (metodos / clases), SLOC, Archivos, AC/EC, DIT, Lack of Cohesion,
 
