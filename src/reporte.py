@@ -1,4 +1,7 @@
+import os
+
 from src import metricas_radon
+from src import deteccion_smells
 
 def ReporteTD(i):
     # Ruta del directorio del proyecto
@@ -37,3 +40,13 @@ def ReporteTD(i):
     print()
     # Indicadores por proyecto a considerar:
     # MI, Duplicacion, Interdependencia, CC (metodos / clases), SLOC, Archivos, AC/EC, DIT, Lack of Cohesion,
+
+    # Code Smells (AST)
+    archivos = []
+    for root, dirs, files in os.walk(project_dir):
+        for file in files:
+            if file.endswith('.py'):
+                archivos.append(os.path.join(root, file))
+
+    for file in archivos:
+        deteccion_smells.detectar_smells(file)

@@ -1,7 +1,7 @@
 import ast
 
 
-class MetricCounter(ast.NodeVisitor):
+class MetricVisitor(ast.NodeVisitor):
     def __init__(self):
         self.loops = 0
         self.conditionals = 0
@@ -9,8 +9,8 @@ class MetricCounter(ast.NodeVisitor):
         self.classes = []
         self.exceptions = 0
         self.empty_exceptions = 0
+        self.long_ternary = []
         self.long_expressions = []
-
 
     def visit_FunctionDef(self, node):
         self.functions.append({
@@ -35,6 +35,9 @@ class MetricCounter(ast.NodeVisitor):
 
     def visit_IfExp(self, node):
         self.conditionals += 1
+        line_length = node.end_col_offset - node.col_offset
+        if line_length >= 40:
+            self.long_ternary.append({'lineno': node.lineno, 'line_length': line_length})
         self.generic_visit(node)
 
     def visit_Try(self, node):
@@ -76,41 +79,8 @@ class MetricCounter(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Expr(self, node):
-        line_length = len(node.__repr__())
-        if line_length > 80:
-            self.long_expressions.append((node.lineno, line_length))
+        line_length = node.end_col_offset - node.col_offset
+        if line_length >= 80:
+            self.long_expressions.append({'lineno': node.lineno, 'line_length': line_length})
         self.generic_visit(node)
-
-def count_metrics(file_path):
-    with open(file_path, 'r') as f:
-        code = f.read()
-
-    tree = ast.parse(code)
-    counter = MetricCounter()
-    counter.visit(tree)
-
-    for func in counter.functions:
-        if len(func['params']) > 2:
-            print(
-                f"La función '{func['name']}' en la línea {func['lineno']} tiene más de 2 parámetros: {func['params']}")
-
-    for cls in counter.classes:
-        print(
-            f"La clase '{cls['name']}' en la línea {cls['lineno']} tiene {cls['methods']} métodos, {cls['attributes']} "
-            f"atributos y {cls['total_lines']} líneas de código")
-        print(f"La clase '{cls['name']}' tiene los siguientes métodos:")
-        for mtd in cls['methods_list']:
-            print(f"El método '{mtd['name']}' tiene '{mtd['total_lines']}' líneas de código")
-
-    for expr in counter.long_expressions:
-        print(
-            f"La expresión en la línea {expr['lineno']} tiene más de 80 caracteres ({len(expr['code'])} caracteres encontrados)")
-
-    print(f"{counter.loops} loops encontrados")
-    print(f"{counter.conditionals} condicionales encontrados")
-    print(f"{len(counter.functions)} funciones encontradas")
-    print(f"{len(counter.classes)} clases encontradas")
-    print(f"{counter.exceptions} cláusulas de excepción encontradas")
-    print(f"{counter.empty_exceptions} cláusulas de excepción vacias")
-
 
