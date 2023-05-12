@@ -61,7 +61,8 @@ class MetricVisitor(ast.NodeVisitor):
             'methods': 0,
             'methods_list': [],
             'attributes': 0,
-            'total_lines': node.end_lineno - node.lineno + 1
+            'total_lines': node.end_lineno - node.lineno + 1,
+            'base_classes': node.bases
         }
 
         for item in node.body:

@@ -42,7 +42,7 @@ def detectar_LC(visited: metricas_ast.MetricVisitor):
             smells.append(
                 f"Code Smell: Clase Larga - "
                 f"La clase '{cls['name']}' en la línea {cls['lineno']} tiene {cls['total_lines']} líneas de código")
-        elif cls['methods']+cls['attributes'] > 40:
+        elif cls['methods'] + cls['attributes'] > 40:
             smells.append(
                 f"Code Smell: Clase Larga - "
                 f"La clase '{cls['name']}' en la línea {cls['lineno']} tiene {cls['methods']} métodos y "
@@ -84,8 +84,20 @@ def detectar_LSC(visited: metricas_ast.MetricVisitor):
 
 
 def detectar_LBCL(visited: metricas_ast.MetricVisitor):
-    # NYI
-    return []
+    # Long Base Class List: #clases base >= 3
+    smells = []
+    for cls in visited.classes:
+        if len(cls['base_classes']) >= 3:
+            smell = (f"Code Smell: Lista de Clases Base Larga - "
+                     f"La clase '{cls['name']}' en la línea {cls['lineno']} tiene más de 3 clases base: ")
+            faltan = len(cls['base_classes'])-1
+            for base in cls['base_classes']:
+                smell += str(base.id)
+                if faltan > 0:
+                    smell += ",  "
+                faltan -= 1
+            smells.append(smell)
+    return smells
 
 
 def detectar_UEH(visited: metricas_ast.MetricVisitor):
