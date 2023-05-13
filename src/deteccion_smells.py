@@ -74,8 +74,14 @@ def detectar_LM(visited: metricas_ast.MetricVisitor):
 
 
 def detectar_LMC(visited: metricas_ast.MetricVisitor):
-    # NYI
-    return []
+    # Long Message Chain: LMC >= 4
+    smells = []
+    for expr in visited.lmc_expressions:
+        smells.append(
+            f"Code Smell: Cadena de Mensajes Larga - "
+            f"La expresión en la línea {expr['lineno']} accede a un objeto mediante una cadena de atributos mayor a 4: "
+            f"{expr['str']}")
+    return smells
 
 
 def detectar_LSC(visited: metricas_ast.MetricVisitor):

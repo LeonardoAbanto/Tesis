@@ -11,6 +11,7 @@ class MetricVisitor(ast.NodeVisitor):
         self.empty_exceptions = 0
         self.long_ternary = []
         self.long_expressions = []
+        self.lmc_expressions = []
 
     def visit_FunctionDef(self, node):
         self.functions.append({
@@ -85,3 +86,23 @@ class MetricVisitor(ast.NodeVisitor):
             self.long_expressions.append({'lineno': node.lineno, 'line_length': line_length})
         self.generic_visit(node)
 
+    def visit_Attribute(self, node):
+        access_chain_length = 0
+        current_node = node
+        expression = []
+
+        while isinstance(current_node, ast.Attribute):
+            expression.append(current_node.attr)
+            current_node = current_node.value
+            access_chain_length += 1
+
+        if access_chain_length >= 4:
+            if isinstance(current_node, ast.Name):
+                expression.append(current_node.id)
+            elif isinstance(current_node, ast.Call):
+                expression.append(ast.dump(current_node.func))
+            expression.reverse()
+            expression_str = '.'.join(str(comp) for comp in expression)
+            self.lmc_expressions.append({'lineno': current_node.lineno, 'str': expression_str})
+
+        self.generic_visit(node)
