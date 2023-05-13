@@ -12,6 +12,7 @@ class MetricVisitor(ast.NodeVisitor):
         self.long_ternary = []
         self.long_expressions = []
         self.lmc_expressions = []
+        self.clc_expressions = []
 
     def visit_FunctionDef(self, node):
         self.functions.append({
@@ -104,5 +105,15 @@ class MetricVisitor(ast.NodeVisitor):
             expression.reverse()
             expression_str = '.'.join(str(comp) for comp in expression)
             self.lmc_expressions.append({'lineno': current_node.lineno, 'str': expression_str})
+        self.generic_visit(node)
+
+    def visit_ListComp(self, node):
+        num_loops = sum(1 for generator in node.generators if isinstance(generator, ast.comprehension))
+        num_conditionals = sum(1 for generator in node.generators if isinstance(generator, ast.comprehension) and generator.ifs)
+        total = num_loops + num_conditionals
+
+        if total >= 4:
+            self.clc_expressions.append(node.lineno)
 
         self.generic_visit(node)
+

@@ -123,8 +123,13 @@ def detectar_LLF(visited: metricas_ast.MetricVisitor):
 
 
 def detectar_CLC(visited: metricas_ast.MetricVisitor):
-    # NYI
-    return []
+    # Complex List Comprehension: NOL + NOCC >= 4 para comprensiones de lista
+    smells = []
+    for expr in visited.clc_expressions:
+        smells.append(
+            f"Code Smell: Comprensión de lista compleja - "
+            f"La comprensión de lista en la línea {expr} tiene más de 4 bucles + condicionales")
+    return smells
 
 
 def detectar_LEC(visited: metricas_ast.MetricVisitor):
