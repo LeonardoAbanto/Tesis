@@ -127,14 +127,20 @@ def detectar_CLC(visited: metricas_ast.MetricVisitor):
     smells = []
     for expr in visited.clc_expressions:
         smells.append(
-            f"Code Smell: Comprensión de lista compleja - "
+            f"Code Smell: Comprensión de Lista Compleja - "
             f"La comprensión de lista en la línea {expr} tiene más de 4 bucles + condicionales")
     return smells
 
 
 def detectar_LEC(visited: metricas_ast.MetricVisitor):
-    # NYI
-    return []
+    # Long Element Chain: cadena de elementos de longitud > 3
+    smells = []
+    for expr in visited.lec_expressions:
+        smells.append(
+            f"Code Smell: Cadena de Elementos Larga - "
+            f"La expresión en la línea {expr['lineno']} es una cadena de elementos de longitud igual o mayor a 3: "
+            f"{expr['str']}")
+    return smells
 
 
 def detectar_LTCE(visited: metricas_ast.MetricVisitor):

@@ -13,6 +13,7 @@ class MetricVisitor(ast.NodeVisitor):
         self.long_expressions = []
         self.lmc_expressions = []
         self.clc_expressions = []
+        self.lec_expressions = []
 
     def visit_FunctionDef(self, node):
         self.functions.append({
@@ -117,3 +118,11 @@ class MetricVisitor(ast.NodeVisitor):
 
         self.generic_visit(node)
 
+    def visit_Subscript(self, node):
+        nested_count = 0
+        while isinstance(node, ast.Subscript):
+            nested_count += 1
+            node = node.value
+        if nested_count >= 3:
+            self.lec_expressions.append({'lineno': node.lineno, 'str': ast.unparse(node)})
+        self.generic_visit(node)
