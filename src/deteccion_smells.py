@@ -13,21 +13,31 @@ def detectar_smells(file):
     visited.visit(tree)
 
     # Llamado a funciones de detección según métricas de árbol visitado
-    all_smells = []
-    all_smells.extend(detectar_LC(visited))
-    all_smells.extend(detectar_LPL(visited))
-    all_smells.extend(detectar_LM(visited))
-    all_smells.extend(detectar_LMC(visited))
-    all_smells.extend(detectar_LSC(visited))
-    all_smells.extend(detectar_LBCL(visited))
-    all_smells.extend(detectar_UEH(visited))
-    all_smells.extend(detectar_LLF(visited))
-    all_smells.extend(detectar_CLC(visited))
-    all_smells.extend(detectar_LEC(visited))
-    all_smells.extend(detectar_LTCE(visited))
-    all_smells.extend(detectar_DC(visited))
+    file_smells = {'count': {}, 'str': []}
 
-    return all_smells
+    # Asignación de smells y funciones
+    smell_functions = {
+        'LC': detectar_LC,
+        'LPL': detectar_LPL,
+        'LM': detectar_LM,
+        'LMC': detectar_LMC,
+        'LSC': detectar_LSC,
+        'LBCL': detectar_LBCL,
+        'UEH': detectar_UEH,
+        'LLF': detectar_LLF,
+        'CLC': detectar_CLC,
+        'LEC': detectar_LEC,
+        'LTCE': detectar_LTCE,
+        'DC': detectar_DC,
+    }
+
+    # Por cada smell ejecutar función y actualizar contador
+    for smell in smell_functions:
+        smell_result = smell_functions[smell](visited)
+        file_smells['str'].extend(smell_result)
+        file_smells['count'].update({smell: len(smell_result)})
+
+    return file_smells
 
 
 def detectar_LC(visited: metricas_ast.MetricVisitor):
