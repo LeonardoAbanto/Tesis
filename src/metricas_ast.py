@@ -14,6 +14,7 @@ class MetricVisitor(ast.NodeVisitor):
         self.lmc_expressions = []
         self.clc_expressions = []
         self.lec_expressions = []
+        self.ueh_statements = []
 
     def visit_FunctionDef(self, node):
         self.functions.append({
@@ -125,4 +126,18 @@ class MetricVisitor(ast.NodeVisitor):
             node = node.value
         if nested_count >= 3:
             self.lec_expressions.append({'lineno': node.lineno, 'str': ast.unparse(node)})
+        self.generic_visit(node)
+
+    def visit_Try(self, node):
+        except_count = len(node.handlers)
+        general_except_count = sum(isinstance(handler.type, ast.Name) and handler.type.id == 'Exception'
+                                   for handler in node.handlers)
+        empty_except_count = sum(handler.body == [] for handler in node.handlers)
+
+        if (except_count == 1 and general_except_count == 1 ) or (except_count == empty_except_count and except_count > 1):
+            self.ueh_statements.append(node)
+
+        self.generic_visit(node)
+
+    def visit_ExceptHandler(self, node):
         self.generic_visit(node)

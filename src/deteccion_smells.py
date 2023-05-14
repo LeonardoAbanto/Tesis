@@ -107,8 +107,14 @@ def detectar_LBCL(visited: metricas_ast.MetricVisitor):
 
 
 def detectar_UEH(visited: metricas_ast.MetricVisitor):
-    # NYI
-    return []
+    # Manejo de Excepciones Inútil: Excepciones totales y generales = 1 o excepciones totales = excepciones vacías
+    smells = []
+    for expr in visited.ueh_statements:
+        smells.append(
+            f"Code Smell: Manejo de Excepciones Inútil - "
+            f"El manejo de excepciones en la línea {expr.lineno} maneja una excepción demasiado general o tiene cláusulas  "
+            f"de excepción vacías.")
+    return smells
 
 
 def detectar_LLF(visited: metricas_ast.MetricVisitor):
