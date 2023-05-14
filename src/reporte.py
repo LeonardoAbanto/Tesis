@@ -47,13 +47,21 @@ def ReporteTD(i):
             if file.endswith('.py'):
                 archivos.append(os.path.join(root, file))
 
+    smells_array = []
+    total_count = {}
     for file in archivos:
         file_smells = deteccion_smells.detectar_smells(file)
         count = file_smells['count']
         smells = file_smells['str']
         if smells:
-            print()
-            print("Análisis de archivo: ", file)
+            smells_array.append('')
+            smells_array.append("Análisis de archivo: " + str(file))
             for smell in smells:
-                print(smell)
-            print(count)
+                smells_array.append(smell)
+        for key, value in count.items():
+            total_count[key] = total_count.get(key, 0) + value
+
+    print()
+    print(total_count)
+    print('\n'.join(smells_array))
+

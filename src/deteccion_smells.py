@@ -17,18 +17,18 @@ def detectar_smells(file):
 
     # Asignación de smells y funciones
     smell_functions = {
-        'LC': detectar_LC,
-        'LPL': detectar_LPL,
-        'LM': detectar_LM,
-        'LMC': detectar_LMC,
-        'LSC': detectar_LSC,
-        'LBCL': detectar_LBCL,
-        'UEH': detectar_UEH,
-        'LLF': detectar_LLF,
-        'CLC': detectar_CLC,
-        'LEC': detectar_LEC,
-        'LTCE': detectar_LTCE,
-        'DC': detectar_DC,
+        'Long Class': detectar_LC,
+        'Long Parameter List': detectar_LPL,
+        'Long Method': detectar_LM,
+        'Long Message Chain': detectar_LMC,
+        'Long Scope Chaining': detectar_LSC,
+        'Long Base Class List': detectar_LBCL,
+        'Useless Exception Handling': detectar_UEH,
+        'Long Lambda Function': detectar_LLF,
+        'Complex List Comprehension': detectar_CLC,
+        'Long Element Chain': detectar_LEC,
+        'Long Ternary Conditional Expression': detectar_LTCE,
+        'Data Class': detectar_DC,
     }
 
     # Por cada smell ejecutar función y actualizar contador
