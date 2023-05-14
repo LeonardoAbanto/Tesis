@@ -79,7 +79,6 @@ class MetricVisitor(ast.NodeVisitor):
                 class_dict['methods_list'].append(method_dict)
             elif isinstance(item, ast.Assign):
                 class_dict['attributes'] += 1
-
         self.classes.append(class_dict)
         self.generic_visit(node)
 
@@ -113,10 +112,8 @@ class MetricVisitor(ast.NodeVisitor):
         num_loops = sum(1 for generator in node.generators if isinstance(generator, ast.comprehension))
         num_conditionals = sum(1 for generator in node.generators if isinstance(generator, ast.comprehension) and generator.ifs)
         total = num_loops + num_conditionals
-
         if total >= 4:
             self.clc_expressions.append(node.lineno)
-
         self.generic_visit(node)
 
     def visit_Subscript(self, node):
@@ -133,10 +130,8 @@ class MetricVisitor(ast.NodeVisitor):
         general_except_count = sum(isinstance(handler.type, ast.Name) and handler.type.id == 'Exception'
                                    for handler in node.handlers)
         empty_except_count = sum(handler.body == [] for handler in node.handlers)
-
         if (except_count == 1 and general_except_count == 1 ) or (except_count == empty_except_count and except_count > 1):
             self.ueh_statements.append(node)
-
         self.generic_visit(node)
 
     def visit_ExceptHandler(self, node):
