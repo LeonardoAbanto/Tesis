@@ -44,10 +44,6 @@ class MetricVisitor(ast.NodeVisitor):
             self.long_ternary.append({'lineno': node.lineno, 'line_length': line_length})
         self.generic_visit(node)
 
-    def visit_Try(self, node):
-        self.exceptions += 1
-        self.generic_visit(node)
-
     def visit_TryFinally(self, node):
         self.exceptions += 1
         self.generic_visit(node)
@@ -110,7 +106,8 @@ class MetricVisitor(ast.NodeVisitor):
 
     def visit_ListComp(self, node):
         num_loops = sum(1 for generator in node.generators if isinstance(generator, ast.comprehension))
-        num_conditionals = sum(1 for generator in node.generators if isinstance(generator, ast.comprehension) and generator.ifs)
+        num_conditionals = sum(1 for generator in node.generators if isinstance(generator, ast.comprehension) and
+                               generator.ifs)
         total = num_loops + num_conditionals
         if total >= 4:
             self.clc_expressions.append(node.lineno)
@@ -126,11 +123,13 @@ class MetricVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Try(self, node):
+        self.exceptions += 1
         except_count = len(node.handlers)
         general_except_count = sum(isinstance(handler.type, ast.Name) and handler.type.id == 'Exception'
                                    for handler in node.handlers)
         empty_except_count = sum(handler.body == [] for handler in node.handlers)
-        if (except_count == 1 and general_except_count == 1 ) or (except_count == empty_except_count and except_count > 1):
+        if (except_count == 1 and general_except_count == 1) or (except_count == empty_except_count and
+                                                                 except_count > 1):
             self.ueh_statements.append(node)
         self.generic_visit(node)
 

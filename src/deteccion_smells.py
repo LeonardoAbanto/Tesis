@@ -27,11 +27,6 @@ def detectar_smells(file):
     all_smells.extend(detectar_LTCE(visited))
 
     return all_smells
-    #
-    # print(f"{visited.loops} loops encontrados")
-    # print(f"{visited.conditionals} condicionales encontrados")
-    # print(f"{visited.exceptions} cláusulas de excepción encontradas")
-    # print(f"{visited.empty_exceptions} cláusulas de excepción vacias")
 
 
 def detectar_LC(visited: metricas_ast.MetricVisitor):
@@ -112,8 +107,8 @@ def detectar_UEH(visited: metricas_ast.MetricVisitor):
     for expr in visited.ueh_statements:
         smells.append(
             f"Code Smell: Manejo de Excepciones Inútil - "
-            f"El manejo de excepciones en la línea {expr.lineno} maneja una excepción demasiado general o tiene cláusulas  "
-            f"de excepción vacías.")
+            f"El manejo de excepciones en la línea {expr.lineno} maneja una excepción demasiado general o tiene "
+            f"cláusulas de excepción vacías.")
     return smells
 
 
