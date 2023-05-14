@@ -17,13 +17,26 @@ class MetricVisitor(ast.NodeVisitor):
         self.ueh_statements = []
 
     def visit_FunctionDef(self, node):
-        self.functions.append({
+        class_dict = ({
             'name': node.name,
             'lineno': node.lineno,
             'params': [arg.arg for arg in node.args.args],
-            'total_lines': node.end_lineno - node.lineno + 1
+            'total_lines': node.end_lineno - node.lineno + 1,
+            'DOC': 0
         })
+        class_dict['DOC'] = self.calculate_depth_closure(node)
+        self.functions.append(class_dict)
         self.generic_visit(node)
+
+    def calculate_depth_closure(self, node):
+        depth = 1
+        # Recorrer las cláusulas "closure" de la función
+        for closure in node.body:
+            if isinstance(closure, ast.FunctionDef):
+                # Llamada recursiva para calcular el depth of closure de la función anidada
+                nested_depth = self.calculate_depth_closure(closure) + 1
+                depth = max(depth, nested_depth)
+        return depth
 
     def visit_For(self, node):
         self.loops += 1

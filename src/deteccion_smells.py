@@ -80,8 +80,15 @@ def detectar_LMC(visited: metricas_ast.MetricVisitor):
 
 
 def detectar_LSC(visited: metricas_ast.MetricVisitor):
-    # NYI
-    return []
+    # Long Scope Chaining: DOC >= 3
+    smells = []
+    for function in visited.functions:
+        if function['DOC'] >= 3:
+            smells.append(
+                f"Code Smell: Cadena de Alcance Larga - "
+                f"La función en la línea {function['lineno']} tiene nivel de anidación alto con DOC de: "
+                f"{function['DOC']}")
+    return smells
 
 
 def detectar_LBCL(visited: metricas_ast.MetricVisitor):
