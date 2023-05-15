@@ -10,6 +10,17 @@ import radon.metrics
 import radon.raw
 
 
+# Clase ModuleMetrics que contiene todas las métricas lo que puede obtener Radon por archivo
+class ModuleMetrics:
+    def __init__(self, file_name, raw_metrics, halstead, cc, mi, mi_params):
+        self.file_name = file_name
+        self.raw_metrics = raw_metrics
+        self.halstead = halstead
+        self.cc = cc
+        self.mi = mi
+        self.mi_params = mi_params
+
+
 # Extracción de métricas utilizando la librería de análisis estático Radon
 def MetricasPorModulo(project_dir):
 
@@ -25,16 +36,6 @@ def MetricasPorModulo(project_dir):
     # Almacenando resultados de Radon por modulo
     metricas_modulos = []
 
-    # Clase ModuleMetrics que contiene todas las métricas lo que puede obtener Radon por archivo
-    class ModuleMetrics:
-        def __init__(self, file_name, raw_metrics, halstead, cc, mi, mi_params):
-            self.file_name = file_name
-            self.raw_metrics = raw_metrics
-            self.halstead = halstead
-            self.cc = cc
-            self.mi = mi
-            self.mi_params = mi_params
-
     # Recorremos la lista de archivos y calculamos las métricas
     for file_name in python_files:
         with open(file_name, 'r', encoding='utf-8') as file:
@@ -48,14 +49,15 @@ def MetricasPorModulo(project_dir):
             # CC
             cc = radon.complexity.cc_visit(source)
             # MI
-            mi = radon.metrics.mi_visit(source,False)
+            mi = radon.metrics.mi_visit(source, False)
             # mi_params: hv, cc, lloc, pcmt
-            mi_params = radon.metrics.mi_parameters(source,False)
+            mi_params = radon.metrics.mi_parameters(source, False)
 
             metrica = ModuleMetrics(os.path.relpath(file_name, project_dir), raw_metrics, halstead, cc, mi, mi_params)
             metricas_modulos.append(metrica)
 
     return metricas_modulos
+
 
 def MetricasProyecto(metricas_modulos):
 
@@ -87,4 +89,3 @@ def MetricasProyecto(metricas_modulos):
     # Devuelve métricas a nivel de proyecto
     Resultado = namedtuple('Resultado', ['mi', 'total_files', 'total_cc', 'total_sloc', 'total_cmt'])
     return Resultado(mi, total_files, cc, sloc, cmt)
-

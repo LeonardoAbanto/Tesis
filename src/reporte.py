@@ -15,6 +15,7 @@ def ReporteTD(i):
     # Información básica:
     print('Lineas de código: ', radon_proyecto.total_sloc, ' / Archivos: ', radon_proyecto.total_files)
     print('% de comentarios: ', "%.2f%%" % (100 * radon_proyecto.total_cmt/radon_proyecto.total_sloc))
+    print('Complejidad ciclomática total: ', radon_proyecto.total_cc)
 
     # MI:
     print()
@@ -32,7 +33,10 @@ def ReporteTD(i):
     print('Módulos con baja mantenibilidad:')
     for modulo in radon_por_modulo:
         if 20 > modulo.mi > 0:
-            print(modulo.file_name, ' - MI: ', str(modulo.mi))
+            print(
+                modulo.file_name, ' - MI: ', str(round(modulo.mi, 2)), ', CC: ', modulo.mi_params[1], ', %COM: ',
+                "%.2f%%" % modulo.mi_params[3], ', LOC: ', modulo.mi_params[2], ', HV: ', round(modulo.mi_params[0], 2)
+            )
             low_mi_encontrado = True
     if not low_mi_encontrado:
         print('--')
@@ -47,6 +51,7 @@ def ReporteTD(i):
             if file.endswith('.py'):
                 archivos.append(os.path.join(root, file))
 
+    # Obtener smells desde función, almacenar cuentas totales y ocurrencias
     smells_array = []
     total_count = {}
     for file in archivos:
@@ -55,12 +60,13 @@ def ReporteTD(i):
         smells = file_smells['str']
         if smells:
             smells_array.append('')
-            smells_array.append("Análisis de archivo: " + str(file))
+            smells_array.append("Detecciones en archivo: " + str(file))
             for smell in smells:
                 smells_array.append(smell)
         for key, value in count.items():
             total_count[key] = total_count.get(key, 0) + value
 
+    # Imprimir totales por smell
     print()
     if total_count:
         print('Total de smells encontrados:')
@@ -69,4 +75,3 @@ def ReporteTD(i):
                 print(key+' - '+str(value))
 
     print('\n'.join(smells_array))
-
