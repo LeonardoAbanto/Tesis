@@ -62,6 +62,10 @@ def ReporteTD(i):
             total_count[key] = total_count.get(key, 0) + value
 
     print()
-    print(total_count)
+    if total_count:
+        print('Total de smells encontrados:')
+        for key, value in total_count.items():
+            print(key+' - '+str(value))
+
     print('\n'.join(smells_array))
 
