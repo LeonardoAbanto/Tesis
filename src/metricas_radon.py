@@ -38,25 +38,29 @@ def MetricasPorModulo(project_dir):
 
     # Recorremos la lista de archivos y calculamos las métricas
     for file_name in python_files:
-        with open(file_name, 'r', encoding='utf-8') as file:
-            # Lee el codigo fuente
-            source = file.read()
-
-            # : LOC, LLOC, SLOC, CMT, MULTI, SINGLE_CMT, BLANK
-            raw_metrics = radon.raw.analyze(source)
-            # Halstead
-            halstead = radon.metrics.h_visit(source)
-            # CC
-            cc = radon.complexity.cc_visit(source)
-            # MI
-            mi = radon.metrics.mi_visit(source, False)
-            # mi_params: hv, cc, lloc, pcmt
-            mi_params = radon.metrics.mi_parameters(source, False)
-
-            metrica = ModuleMetrics(os.path.relpath(file_name, project_dir), raw_metrics, halstead, cc, mi, mi_params)
-            metricas_modulos.append(metrica)
+        metricas_modulos.append(MetricasModulo(file_name))
 
     return metricas_modulos
+
+
+def MetricasModulo(file):
+    with open(file, 'r', encoding='utf-8') as file:
+        # Lee el codigo fuente
+        source = file.read()
+
+        # : LOC, LLOC, SLOC, CMT, MULTI, SINGLE_CMT, BLANK
+        raw_metrics = radon.raw.analyze(source)
+        # Halstead
+        halstead = radon.metrics.h_visit(source)
+        # CC
+        cc = radon.complexity.cc_visit(source)
+        # MI
+        mi = radon.metrics.mi_visit(source, False)
+        # mi_params: hv, cc, lloc, pcmt
+        mi_params = radon.metrics.mi_parameters(source, False)
+
+        metrica = ModuleMetrics(file.name, raw_metrics, halstead, cc, mi, mi_params)
+        return metrica
 
 
 def MetricasProyecto(metricas_modulos):

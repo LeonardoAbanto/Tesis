@@ -14,18 +14,39 @@ def ReporteTD(i):
 
     # Información básica:
     print('Lineas de código: ', radon_proyecto.total_sloc, ' / Archivos: ', radon_proyecto.total_files)
-    print('% de comentarios: ', "%.2f%%" % (100 * radon_proyecto.total_cmt/radon_proyecto.total_sloc))
-    print('Complejidad ciclomática total: ', radon_proyecto.total_cc)
+
+    print('Complejidad total: ', radon_proyecto.total_cc)
 
     # MI:
     print()
     mi = radon_proyecto.mi
-    if mi < 10:
-        print('Índice de mantenibilidad: ', str(round(radon_proyecto.mi, 2)), ' - Mantenibilidad baja')
-    elif mi < 20:
-        print('Índice de mantenibilidad: ', str(round(radon_proyecto.mi, 2)), ' - Mantenibilidad media')
-    else:
-        print('Índice de mantenibilidad: ', str(round(radon_proyecto.mi, 2)), ' - Mantenibilidad alta')
+    print(rating_MI(mi))
+    print()
+
+    # CMT
+    cmt = radon_proyecto.total_cmt / radon_proyecto.total_sloc
+    print(rating_cmt(cmt))
+
+    # % CC>60
+    cc_modulo_count = 0
+    for modulo in radon_por_modulo:
+        if modulo.mi_params[1] > 60:
+            cc_modulo_count += 1
+    pct_cc_modulos = cc_modulo_count/len(radon_por_modulo)
+    print('Módulos con complejidad > 60: ', "%.2f%%" % (100 * pct_cc_modulos), ' - Nivel ',
+          rating_cc(pct_cc_modulos))
+
+    # % CC>8
+    function_count = 0
+    cc_function_count = 0
+    for modulo in radon_por_modulo:
+        for func in modulo.cc:
+            function_count += 1
+            if func.complexity > 8:
+                cc_function_count += 1
+    pct_cc_metodos = cc_function_count / function_count
+    print('Métodos con complejidad > 8: ', "%.2f%%" % (100 * pct_cc_metodos), ' - Nivel ',
+          rating_cc(pct_cc_metodos))
 
     # Módulos con bajo MI
     print()
@@ -75,3 +96,33 @@ def ReporteTD(i):
                 print(key+' - '+str(value))
 
     print('\n'.join(smells_array))
+
+
+def rating_MI(mi):
+    if mi < 10:
+        nivel = 'baja'
+    elif mi < 20:
+        nivel = 'media'
+    else:
+        nivel = 'alta'
+    return ''.join(('Índice de mantenibilidad: ', str(round(mi, 2)), ' - Mantenibilidad ', nivel))
+
+
+def rating_cmt(cmt):
+    if cmt >= 0.3:
+        nivel = 'Verde'
+    elif cmt >= 0.2:
+        nivel = 'Amarillo'
+    else:
+        nivel = 'Rojo'
+    return ''.join(('Densidad de comentarios: ', "%.2f%%" % (100 * cmt), ' - Nivel ', nivel))
+
+
+def rating_cc(cc):
+    if cc <= 0.1:
+        nivel = 'Verde'
+    elif cc <= 0.15:
+        nivel = 'Amarillo'
+    else:
+        nivel = 'Rojo'
+    return nivel

@@ -14,6 +14,7 @@ for modulo in metricas_por_modulo:
     print("Archivo: " + str(modulo.file_name) + " MI: " + str(modulo.mi))
     print(modulo.raw_metrics)
     print(modulo.mi_params)
+    print(modulo.cc)
     print("")
 
 # archivo = 5
