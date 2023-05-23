@@ -3,10 +3,9 @@ from src import metricas_radon
 from src import deteccion_smells
 
 
-def ReporteTD(i):
+def ReporteTD(project_dir):
     # Ruta del directorio del proyecto
-    project_dir = 'C:\\Users\\leona\\Desktop\\TESIS\\ProyectosPython\\' + i
-    print('Proyecto: ', i)
+    print('Proyecto: ', project_dir)
 
     # Ejecución Radon
     radon_por_modulo = metricas_radon.MetricasPorModulo(project_dir)
