@@ -5,31 +5,83 @@ import tkinter as tk
 
 
 def ReporteTD_UI(project_dir):
-    # Crear una instancia de la ventana principal
-    ventana = tk.Tk()
 
-    # Ruta del directorio del proyecto
-    proyecto_label = tk.Label(ventana, text='Proyecto: ' + project_dir)
-    proyecto_label.pack()
+    # Variables
+    background_color = '#D4E4E4'
 
-    # Ejecución Radon
+    # Ejecución funciones
     radon_por_modulo = metricas_radon.MetricasPorModulo(project_dir)
     radon_proyecto = metricas_radon.MetricasProyecto(radon_por_modulo)
 
-    # Información básica:
-    sloc_label = tk.Label(ventana, text='Lineas de código: ' + str(radon_proyecto.total_sloc) + ' / Archivos: ' + str(radon_proyecto.total_files))
-    sloc_label.pack()
+    # Creación y configuración de ventana principal
+    ventana = tk.Tk()
+    ventana.title("Reporte de Deuda Técnica")
+    ventana.configure(background=background_color)
+    ventana.grid_rowconfigure(0, weight=1)
+    ventana.grid_columnconfigure(0, weight=1)
 
-    cc_label = tk.Label(ventana, text='Complejidad total: ' + str(radon_proyecto.total_cc))
-    cc_label.pack()
+    # Frame Info Proyecto
+    frame_info_proyecto = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
+    frame_info_proyecto.grid(row=0, column=0, padx=10, pady=10)
+
+    # Nombre del proyecto
+    frame_titulo = tk.Frame(frame_info_proyecto)
+    frame_titulo.pack()
+    nombre_carpeta = os.path.basename(project_dir)
+    label1 = tk.Label(frame_titulo, text='Nombre del proyecto:', font=("Arial", 13), background='white')
+    label1.pack(side=tk.LEFT)
+    nombre_proyecto = tk.Label(frame_titulo, text=nombre_carpeta, font=("Arial", 13, "bold"), background='white')
+    nombre_proyecto.pack(side=tk.LEFT)
+
+    # Tamaño de proyecto
+    sloc = tk.Label(frame_info_proyecto, text=('Líneas de codigo: '+str(radon_proyecto.total_sloc)),
+                    font=("Arial", 13), background='white')
+    sloc.pack()
+    files = tk.Label(frame_info_proyecto, text=('Total de archivos python: '+str(radon_proyecto.total_files)),
+                     font=("Arial", 13), background='white')
+    files.pack()
+
+    # Frame Indicadores
+    frame_indicadores = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
+    frame_indicadores.grid(row=1, column=0, padx=10, pady=10)
+
+    # Complejidad (temporal):
+    complexity = tk.Label(frame_indicadores, text=('Complejidad total: '+str(radon_proyecto.total_cc)),
+                          font=("Arial", 13), background='white')
+    complexity.pack()
+
+
+    grupo_2 = tk.Frame(ventana, background=background_color)
+    grupo_2.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+
+
+
+    # Crear un widget de desplazamiento vertical
+    scrollbar = tk.Scrollbar(ventana)
+    scrollbar.grid(row=2, column=1, sticky=tk.N+tk.S)
+
+    # Crear un widget de texto para información de smells
+    text_widget = tk.Text(grupo_2, yscrollcommand=scrollbar.set)
+    text_widget.pack()
+
+    # Asociar la barra de desplazamiento al widget de texto
+    scrollbar.config(command=text_widget.yview)
+
+
+
+
+
+
+
+
+
+
 
     # MI:
-    mi_label = tk.Label(ventana, text='MI: ' + str(radon_proyecto.mi))
-    mi_label.pack()
+    text_widget.insert(tk.END, 'MI: ' + str(radon_proyecto.mi) + '\n')
 
     # CMT
-    cmt_label = tk.Label(ventana, text='CMT: ' + str(radon_proyecto.total_cmt / radon_proyecto.total_sloc))
-    cmt_label.pack()
+    text_widget.insert(tk.END, 'CMT: ' + str(radon_proyecto.total_cmt / radon_proyecto.total_sloc) + '\n')
 
     # % CC>60
     cc_modulo_count = 0
@@ -37,8 +89,7 @@ def ReporteTD_UI(project_dir):
         if modulo.mi_params[1] > 60:
             cc_modulo_count += 1
     pct_cc_modulos = cc_modulo_count/len(radon_por_modulo)
-    pct_cc_modulos_label = tk.Label(ventana, text='Módulos con complejidad > 60: ' + "%.2f%%" % (100 * pct_cc_modulos))
-    pct_cc_modulos_label.pack()
+    text_widget.insert(tk.END, 'Módulos con complejidad > 60: ' + "%.2f%%" % (100 * pct_cc_modulos) + '\n')
 
     # % CC>8
     function_count = 0
@@ -49,23 +100,19 @@ def ReporteTD_UI(project_dir):
             if func.complexity > 8:
                 cc_function_count += 1
     pct_cc_metodos = cc_function_count / function_count
-    pct_cc_metodos_label = tk.Label(ventana, text='Métodos con complejidad > 8: ' + "%.2f%%" % (100 * pct_cc_metodos))
-    pct_cc_metodos_label.pack()
+    text_widget.insert(tk.END, 'Métodos con complejidad > 8: ' + "%.2f%%" % (100 * pct_cc_metodos) + '\n')
 
     # Módulos con bajo MI
     low_mi_encontrado = False
-    low_mi_label = tk.Label(ventana, text='Módulos con baja mantenibilidad:')
-    low_mi_label.pack()
+    text_widget.insert(tk.END, 'Módulos con baja mantenibilidad:\n')
     for modulo in radon_por_modulo:
         if 20 > modulo.mi > 0:
-            modulo_label = tk.Label(ventana, text=modulo.file_name + ' - MI: ' + str(round(modulo.mi, 2)) + ', CC: ' +
-                                           modulo.mi_params[1] + ', %COM: ' + "%.2f%%" % modulo.mi_params[3] +
-                                           ', LOC: ' + modulo.mi_params[2] + ', HV: ' + round(modulo.mi_params[0], 2))
-            modulo_label.pack()
+            text_widget.insert(tk.END, modulo.file_name + ' - MI: ' + str(round(modulo.mi, 2)) + ', CC: ' +
+                               modulo.mi_params[1] + ', %COM: ' + "%.2f%%" % modulo.mi_params[3] +
+                               ', LOC: ' + modulo.mi_params[2] + ', HV: ' + str(round(modulo.mi_params[0], 2)) + '\n')
             low_mi_encontrado = True
     if not low_mi_encontrado:
-        no_low_mi_label = tk.Label(ventana, text='--')
-        no_low_mi_label.pack()
+        text_widget.insert(tk.END, '--\n')
 
     # Code Smells (AST)
     archivos = []
@@ -89,17 +136,13 @@ def ReporteTD_UI(project_dir):
             total_count[key] = total_count.get(key, 0) + value
 
     if total_count:
-        smells_totals_label = tk.Label(ventana, text='Total de smells encontrados:')
-        smells_totals_label.pack()
+        text_widget.insert(tk.END, 'Total de smells encontrados:\n')
         for key, value in total_count.items():
             if value > 0:
-                smells_totals = tk.Label(ventana, text=key+' - '+str(value))
-                smells_totals.pack()
+                text_widget.insert(tk.END, key + ' - ' + str(value) + '\n')
 
-    smells_array_label = tk.Label(ventana, text='\n'.join(smells_array))
-    smells_array_label.pack()
+    text_widget.insert(tk.END, '\n'.join(smells_array))
 
-    # Ejecutar el bucle principal de la aplicación
     ventana.mainloop()
 
 
