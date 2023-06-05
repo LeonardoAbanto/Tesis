@@ -7,7 +7,7 @@ import tkinter as tk
 def ReporteTD_UI(project_dir):
     # Variables
     background_color = '#D4E4E4'
-    ratings_colores = {'A': '#FF0000', 'B': '#FFFF00', 'C': '#00FF00'}
+    ratings_colores = {'A': '#00FF00', 'B': '#FFFF00', 'C': '#FF0000'}
 
     # Ejecución funciones
     radon_por_modulo = metricas_radon.MetricasPorModulo(project_dir)
@@ -60,11 +60,53 @@ def ReporteTD_UI(project_dir):
     frame_mi.pack()
     label_mi = tk.Label(frame_mi, text='Indice de Mantenibilidad (Proyecto):', font=("Arial", 13), background='white')
     label_mi.pack(side=tk.LEFT)
-    mi_proyecto = round(radon_proyecto.mi, 2)
-    color_nivel_mi = ratings_colores[rating_MI(mi_proyecto)]
-    mi = tk.Label(frame_mi, text=str(mi_proyecto), font=("Arial", 13), background=color_nivel_mi)
+    mi_proyecto = radon_proyecto.mi
+    rating_mi = rating_MI(mi_proyecto)
+    mi = tk.Label(frame_mi, text=str(round(mi_proyecto, 2)), font=("Arial", 13), background=ratings_colores[rating_mi])
     mi.pack(side=tk.LEFT)
+    # CMT:
+    frame_cmt = tk.Frame(frame_indicadores)
+    frame_cmt.pack()
+    label_cmt = tk.Label(frame_cmt, text='Densidad de Comentarios:', font=("Arial", 13), background='white')
+    label_cmt.pack(side=tk.LEFT)
+    cmt_pct = radon_proyecto.total_cmt / radon_proyecto.total_sloc
+    rating_cmt = rating_CMT(cmt_pct)
+    cmt = tk.Label(frame_cmt, text="%.2f%%" % (100 * cmt_pct), font=("Arial", 13),
+                   background=ratings_colores[rating_cmt])
+    cmt.pack(side=tk.LEFT)
 
+    # % Módulos CC>60
+    frame_cc_mod = tk.Frame(frame_indicadores)
+    frame_cc_mod.pack()
+    label_cc_mod = tk.Label(frame_cc_mod, text='Módulos con alta complejidad:', font=("Arial", 13), background='white')
+    label_cc_mod.pack(side=tk.LEFT)
+    cc_modulo_count = 0
+    for modulo in radon_por_modulo:
+        if modulo.mi_params[1] > 60:
+            cc_modulo_count += 1
+    pct_cc_modulos = cc_modulo_count / len(radon_por_modulo)
+    rating_cc_mod = rating_cc(pct_cc_modulos)
+    cc_mod = tk.Label(frame_cc_mod, text="%.2f%%" % (100 * pct_cc_modulos), font=("Arial", 13),
+                      background=ratings_colores[rating_cc_mod])
+    cc_mod.pack(side=tk.LEFT)
+
+    # % Módulos CC>60
+    frame_cc_met = tk.Frame(frame_indicadores)
+    frame_cc_met.pack()
+    label_cc_met = tk.Label(frame_cc_met, text='Métodos con alta complejidad:', font=("Arial", 13), background='white')
+    label_cc_met.pack(side=tk.LEFT)
+    function_count = 0
+    cc_function_count = 0
+    for modulo in radon_por_modulo:
+        for func in modulo.cc:
+            function_count += 1
+            if func.complexity > 8:
+                cc_function_count += 1
+    pct_cc_metodos = cc_function_count / function_count
+    rating_cc_met = rating_cc(pct_cc_metodos)
+    cc_met = tk.Label(frame_cc_met, text="%.2f%%" % (100 * pct_cc_metodos), font=("Arial", 13),
+                      background=ratings_colores[rating_cc_met])
+    cc_met.pack(side=tk.LEFT)
     #
     #
     #
@@ -85,28 +127,6 @@ def ReporteTD_UI(project_dir):
 
     # Asociar la barra de desplazamiento al widget de texto
     scrollbar.config(command=text_widget.yview)
-
-    # CMT
-    text_widget.insert(tk.END, 'CMT: ' + str(radon_proyecto.total_cmt / radon_proyecto.total_sloc) + '\n')
-
-    # % CC>60
-    cc_modulo_count = 0
-    for modulo in radon_por_modulo:
-        if modulo.mi_params[1] > 60:
-            cc_modulo_count += 1
-    pct_cc_modulos = cc_modulo_count / len(radon_por_modulo)
-    text_widget.insert(tk.END, 'Módulos con complejidad > 60: ' + "%.2f%%" % (100 * pct_cc_modulos) + '\n')
-
-    # % CC>8
-    function_count = 0
-    cc_function_count = 0
-    for modulo in radon_por_modulo:
-        for func in modulo.cc:
-            function_count += 1
-            if func.complexity > 8:
-                cc_function_count += 1
-    pct_cc_metodos = cc_function_count / function_count
-    text_widget.insert(tk.END, 'Métodos con complejidad > 8: ' + "%.2f%%" % (100 * pct_cc_metodos) + '\n')
 
     # Módulos con bajo MI
     low_mi_encontrado = False
@@ -173,7 +193,7 @@ def ReporteTD(project_dir):
 
     # CMT
     cmt = radon_proyecto.total_cmt / radon_proyecto.total_sloc
-    print(rating_cmt(cmt))
+    print(rating_cmt_texto(cmt))
 
     # % CC>60
     cc_modulo_count = 0
@@ -182,7 +202,7 @@ def ReporteTD(project_dir):
             cc_modulo_count += 1
     pct_cc_modulos = cc_modulo_count / len(radon_por_modulo)
     print('Módulos con complejidad > 60: ', "%.2f%%" % (100 * pct_cc_modulos), ' - Nivel ',
-          rating_cc(pct_cc_modulos))
+          rating_cc_texto(pct_cc_modulos))
 
     # % CC>8
     function_count = 0
@@ -194,7 +214,7 @@ def ReporteTD(project_dir):
                 cc_function_count += 1
     pct_cc_metodos = cc_function_count / function_count
     print('Métodos con complejidad > 8: ', "%.2f%%" % (100 * pct_cc_metodos), ' - Nivel ',
-          rating_cc(pct_cc_metodos))
+          rating_cc_texto(pct_cc_metodos))
 
     # Módulos con bajo MI
     print()
@@ -248,11 +268,11 @@ def ReporteTD(project_dir):
 
 def rating_MI(mi):
     if mi < 10:
-        return 'A'
+        return 'C'
     elif mi < 20:
         return 'B'
     else:
-        return 'C'
+        return 'A'
 
 
 def rating_MI_texto(mi):
@@ -265,7 +285,16 @@ def rating_MI_texto(mi):
     return ''.join(('Índice de mantenibilidad: ', str(round(mi, 2)), ' - Mantenibilidad ', nivel))
 
 
-def rating_cmt(cmt):
+def rating_CMT(cmt):
+    if cmt >= 0.3:
+        return 'A'
+    elif cmt >= 0.2:
+        return 'B'
+    else:
+        return 'C'
+
+
+def rating_cmt_texto(cmt):
     if cmt >= 0.3:
         nivel = 'Verde'
     elif cmt >= 0.2:
@@ -275,7 +304,7 @@ def rating_cmt(cmt):
     return ''.join(('Densidad de comentarios: ', "%.2f%%" % (100 * cmt), ' - Nivel ', nivel))
 
 
-def rating_cc(cc):
+def rating_cc_texto(cc):
     if cc <= 0.1:
         nivel = 'Verde'
     elif cc <= 0.15:
@@ -283,3 +312,12 @@ def rating_cc(cc):
     else:
         nivel = 'Rojo'
     return nivel
+
+
+def rating_cc(cc):
+    if cc <= 0.1:
+        return 'A'
+    elif cc <= 0.15:
+        return 'B'
+    else:
+        return 'C'
