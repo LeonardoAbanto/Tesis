@@ -5,9 +5,9 @@ import tkinter as tk
 
 
 def ReporteTD_UI(project_dir):
-
     # Variables
     background_color = '#D4E4E4'
+    ratings_colores = {'A': '#FF0000', 'B': '#FFFF00', 'C': '#00FF00'}
 
     # Ejecución funciones
     radon_por_modulo = metricas_radon.MetricasPorModulo(project_dir)
@@ -28,37 +28,56 @@ def ReporteTD_UI(project_dir):
     frame_titulo = tk.Frame(frame_info_proyecto)
     frame_titulo.pack()
     nombre_carpeta = os.path.basename(project_dir)
-    label1 = tk.Label(frame_titulo, text='Nombre del proyecto:', font=("Arial", 13), background='white')
-    label1.pack(side=tk.LEFT)
+    label_titulo = tk.Label(frame_titulo, text='Nombre del proyecto:', font=("Arial", 13), background='white')
+    label_titulo.pack(side=tk.LEFT)
     nombre_proyecto = tk.Label(frame_titulo, text=nombre_carpeta, font=("Arial", 13, "bold"), background='white')
     nombre_proyecto.pack(side=tk.LEFT)
 
     # Tamaño de proyecto
-    sloc = tk.Label(frame_info_proyecto, text=('Líneas de codigo: '+str(radon_proyecto.total_sloc)),
-                    font=("Arial", 13), background='white')
-    sloc.pack()
-    files = tk.Label(frame_info_proyecto, text=('Total de archivos python: '+str(radon_proyecto.total_files)),
-                     font=("Arial", 13), background='white')
-    files.pack()
+    frame_sloc = tk.Frame(frame_info_proyecto)
+    frame_sloc.pack()
+    label_sloc = tk.Label(frame_sloc, text='Líneas de codigo:', font=("Arial", 13), background='white')
+    label_sloc.pack(side=tk.LEFT)
+    sloc = tk.Label(frame_sloc, text=str(radon_proyecto.total_sloc), font=("Arial", 13, "bold"), background='white')
+    sloc.pack(side=tk.LEFT)
+    frame_files = tk.Frame(frame_info_proyecto)
+    frame_files.pack()
+    label_files = tk.Label(frame_files, text='Total de archivos python:', font=("Arial", 13), background='white')
+    label_files.pack(side=tk.LEFT)
+    files = tk.Label(frame_files, text=str(radon_proyecto.total_files), font=("Arial", 13, "bold"), background='white')
+    files.pack(side=tk.LEFT)
 
     # Frame Indicadores
     frame_indicadores = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
     frame_indicadores.grid(row=1, column=0, padx=10, pady=10)
 
     # Complejidad (temporal):
-    complexity = tk.Label(frame_indicadores, text=('Complejidad total: '+str(radon_proyecto.total_cc)),
+    complexity = tk.Label(frame_indicadores, text=('Complejidad total: ' + str(radon_proyecto.total_cc)),
                           font=("Arial", 13), background='white')
     complexity.pack()
+    # MI:
+    frame_mi = tk.Frame(frame_indicadores)
+    frame_mi.pack()
+    label_mi = tk.Label(frame_mi, text='Indice de Mantenibilidad (Proyecto):', font=("Arial", 13), background='white')
+    label_mi.pack(side=tk.LEFT)
+    mi_proyecto = round(radon_proyecto.mi, 2)
+    color_nivel_mi = ratings_colores[rating_MI(mi_proyecto)]
+    mi = tk.Label(frame_mi, text=str(mi_proyecto), font=("Arial", 13), background=color_nivel_mi)
+    mi.pack(side=tk.LEFT)
 
+    #
+    #
+    #
+    #
+    #
+    #
 
     grupo_2 = tk.Frame(ventana, background=background_color)
-    grupo_2.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-
-
+    grupo_2.grid(row=2, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
 
     # Crear un widget de desplazamiento vertical
     scrollbar = tk.Scrollbar(ventana)
-    scrollbar.grid(row=2, column=1, sticky=tk.N+tk.S)
+    scrollbar.grid(row=2, column=1, sticky=tk.N + tk.S)
 
     # Crear un widget de texto para información de smells
     text_widget = tk.Text(grupo_2, yscrollcommand=scrollbar.set)
@@ -66,19 +85,6 @@ def ReporteTD_UI(project_dir):
 
     # Asociar la barra de desplazamiento al widget de texto
     scrollbar.config(command=text_widget.yview)
-
-
-
-
-
-
-
-
-
-
-
-    # MI:
-    text_widget.insert(tk.END, 'MI: ' + str(radon_proyecto.mi) + '\n')
 
     # CMT
     text_widget.insert(tk.END, 'CMT: ' + str(radon_proyecto.total_cmt / radon_proyecto.total_sloc) + '\n')
@@ -88,7 +94,7 @@ def ReporteTD_UI(project_dir):
     for modulo in radon_por_modulo:
         if modulo.mi_params[1] > 60:
             cc_modulo_count += 1
-    pct_cc_modulos = cc_modulo_count/len(radon_por_modulo)
+    pct_cc_modulos = cc_modulo_count / len(radon_por_modulo)
     text_widget.insert(tk.END, 'Módulos con complejidad > 60: ' + "%.2f%%" % (100 * pct_cc_modulos) + '\n')
 
     # % CC>8
@@ -162,7 +168,7 @@ def ReporteTD(project_dir):
     # MI:
     print()
     mi = radon_proyecto.mi
-    print(rating_MI(mi))
+    print(rating_MI_texto(mi))
     print()
 
     # CMT
@@ -174,7 +180,7 @@ def ReporteTD(project_dir):
     for modulo in radon_por_modulo:
         if modulo.mi_params[1] > 60:
             cc_modulo_count += 1
-    pct_cc_modulos = cc_modulo_count/len(radon_por_modulo)
+    pct_cc_modulos = cc_modulo_count / len(radon_por_modulo)
     print('Módulos con complejidad > 60: ', "%.2f%%" % (100 * pct_cc_modulos), ' - Nivel ',
           rating_cc(pct_cc_modulos))
 
@@ -235,12 +241,21 @@ def ReporteTD(project_dir):
         print('Total de smells encontrados:')
         for key, value in total_count.items():
             if value > 0:
-                print(key+' - '+str(value))
+                print(key + ' - ' + str(value))
 
     print('\n'.join(smells_array))
 
 
 def rating_MI(mi):
+    if mi < 10:
+        return 'A'
+    elif mi < 20:
+        return 'B'
+    else:
+        return 'C'
+
+
+def rating_MI_texto(mi):
     if mi < 10:
         nivel = 'baja'
     elif mi < 20:
