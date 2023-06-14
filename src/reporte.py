@@ -107,6 +107,27 @@ def ReporteTD_UI(project_dir):
     cc_met = tk.Label(frame_cc_met, text="%.2f%%" % (100 * pct_cc_metodos), font=("Arial", 13),
                       background=ratings_colores[rating_cc_met])
     cc_met.pack(side=tk.LEFT)
+
+    # Frame Módulos MI
+    frame_low_mi = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
+    frame_low_mi.grid(row=2, column=0, padx=10, pady=10)
+
+    # Módulos con bajo MI
+    low_mi_encontrado = False
+    titulo = tk.Label(frame_low_mi, text='Módulos con baja mantenibilidad:', font=("Arial", 13), background='white')
+    titulo.pack()
+    for modulo in radon_por_modulo:
+        if 20 > modulo.mi > 0:
+            low_mi = tk.Label(frame_low_mi, text=(modulo.file_name + ' - MI: ' + str(round(modulo.mi, 2)) + ', CC: ' +
+                                                  str(modulo.mi_params[1]) + ', %COM: ' + "%.2f%%" % modulo.mi_params[3] +
+                                                  ', LOC: ' + str(modulo.mi_params[2]) + ', HV: ' + str(
+                        round(modulo.mi_params[0], 2)))
+                              , font=("Arial", 13), background='white')
+            low_mi.pack()
+            low_mi_encontrado = True
+    if not low_mi_encontrado:
+        not_found = tk.Label(frame_low_mi, text='-', font=("Arial", 13), background='white')
+        not_found.pack()
     #
     #
     #
@@ -115,11 +136,11 @@ def ReporteTD_UI(project_dir):
     #
 
     grupo_2 = tk.Frame(ventana, background=background_color)
-    grupo_2.grid(row=2, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
+    grupo_2.grid(row=3, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
 
     # Crear un widget de desplazamiento vertical
     scrollbar = tk.Scrollbar(ventana)
-    scrollbar.grid(row=2, column=1, sticky=tk.N + tk.S)
+    scrollbar.grid(row=3, column=1, sticky=tk.N + tk.S)
 
     # Crear un widget de texto para información de smells
     text_widget = tk.Text(grupo_2, yscrollcommand=scrollbar.set)
@@ -127,18 +148,6 @@ def ReporteTD_UI(project_dir):
 
     # Asociar la barra de desplazamiento al widget de texto
     scrollbar.config(command=text_widget.yview)
-
-    # Módulos con bajo MI
-    low_mi_encontrado = False
-    text_widget.insert(tk.END, 'Módulos con baja mantenibilidad:\n')
-    for modulo in radon_por_modulo:
-        if 20 > modulo.mi > 0:
-            text_widget.insert(tk.END, modulo.file_name + ' - MI: ' + str(round(modulo.mi, 2)) + ', CC: ' +
-                               modulo.mi_params[1] + ', %COM: ' + "%.2f%%" % modulo.mi_params[3] +
-                               ', LOC: ' + modulo.mi_params[2] + ', HV: ' + str(round(modulo.mi_params[0], 2)) + '\n')
-            low_mi_encontrado = True
-    if not low_mi_encontrado:
-        text_widget.insert(tk.END, '--\n')
 
     # Code Smells (AST)
     archivos = []
