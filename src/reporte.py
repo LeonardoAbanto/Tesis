@@ -53,14 +53,17 @@ def ReporteTD_UI(project_dir):
     # Frame Indicadores
     frame_indicadores = tk.Frame(frame_1, background='white', borderwidth=2, relief="solid")
     frame_indicadores.grid(row=1, column=2, padx=10, pady=10, sticky="nw")
+    titulo_indicadores = tk.Label(frame_indicadores, text='Indicadores del proyecto:', font=("Arial", 14, "bold"),
+                                  background='white')
+    titulo_indicadores.grid(row=0, column=0, sticky="w", pady=2, padx=2)
     # Complejidad (temporal):
     complexity = tk.Label(frame_indicadores, text=('Complejidad total: ' + str(radon_proyecto.total_cc)),
-                          font=("Arial", 13), background='white')
+                          font=("Arial", 12), background='white')
     complexity.grid(row=1, column=0, sticky="w", pady=2, padx=2)
     # MI:
     frame_mi = tk.Frame(frame_indicadores)
     frame_mi.grid(row=2, column=0, sticky="w", pady=2, padx=2)
-    label_mi = tk.Label(frame_mi, text='Indice de Mantenibilidad:', font=("Arial", 13), background='white')
+    label_mi = tk.Label(frame_mi, text='Indice de Mantenibilidad:', font=("Arial", 12), background='white')
     label_mi.pack(side=tk.LEFT)
     mi_proyecto = radon_proyecto.mi
     rating_mi = rating_MI(mi_proyecto)
@@ -113,7 +116,8 @@ def ReporteTD_UI(project_dir):
     frame_low_mi.grid(row=3, column=0, padx=10, pady=10, sticky="w")
     # Módulos con bajo MI
     low_mi_encontrado = False
-    titulo = tk.Label(frame_low_mi, text='Módulos con baja mantenibilidad:', font=("Arial", 14, "bold"), background='white')
+    titulo = tk.Label(frame_low_mi, text='Módulos con baja mantenibilidad identificados:',
+                      font=("Arial", 14, "bold"), background='white')
     titulo.grid(sticky="w")
     for modulo in radon_por_modulo:
         if 20 > modulo.mi > 0:
