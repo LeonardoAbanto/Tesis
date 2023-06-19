@@ -22,7 +22,7 @@ def ReporteTD_UI(project_dir):
 
     # Frame Info Proyecto
     frame_info_proyecto = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
-    frame_info_proyecto.grid(row=0, column=0, padx=10, pady=10)
+    frame_info_proyecto.grid(row=1, column=0, padx=10, pady=10)
 
     # Nombre del proyecto
     frame_titulo = tk.Frame(frame_info_proyecto)
@@ -49,7 +49,7 @@ def ReporteTD_UI(project_dir):
 
     # Frame Indicadores
     frame_indicadores = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
-    frame_indicadores.grid(row=1, column=0, padx=10, pady=10)
+    frame_indicadores.grid(row=2, column=0, padx=10, pady=10)
 
     # Complejidad (temporal):
     complexity = tk.Label(frame_indicadores, text=('Complejidad total: ' + str(radon_proyecto.total_cc)),
@@ -110,7 +110,7 @@ def ReporteTD_UI(project_dir):
 
     # Frame Módulos MI
     frame_low_mi = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
-    frame_low_mi.grid(row=2, column=0, padx=10, pady=10)
+    frame_low_mi.grid(row=3, column=0, padx=10, pady=10)
 
     # Módulos con bajo MI
     low_mi_encontrado = False
@@ -132,29 +132,30 @@ def ReporteTD_UI(project_dir):
 
     # Frames smells
     frame_smells_resumido = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
-    frame_smells_resumido.grid(row=3, column=0, padx=10, pady=10)
+    frame_smells_resumido.grid(row=4, column=0, padx=10, pady=10)
 
     frame_smells_detalle = tk.Frame(ventana, background=background_color)
-    frame_smells_detalle.grid(row=4, column=0)
-
-    # Scrollbar total
-    scrollbar = tk.Scrollbar(ventana, orient=tk.VERTICAL)
-    scrollbar.grid(row = 0, column = 2)
+    frame_smells_detalle.grid(row=5, column=0)
 
     # Crear un widget de desplazamiento vertical
     scrollbar_y = tk.Scrollbar(frame_smells_detalle, orient=tk.VERTICAL)
-    scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
+    scrollbar_y.grid(row=0, column=1, sticky=tk.NS)
 
     # Crear un widget de desplazamiento horizontal
     scrollbar_x = tk.Scrollbar(frame_smells_detalle, orient=tk.HORIZONTAL)
-    scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
+    scrollbar_x.grid(row=1, column=0, sticky=tk.EW)
 
     # Crear un widget de texto para información de smells
-    text_widget = tk.Text(frame_smells_detalle, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set, font=("Arial", 13), background='white')
-    text_widget.pack(fill=tk.BOTH, expand=True)
+    text_widget = tk.Text(frame_smells_detalle, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set,
+                          font=("Arial", 13), background='white')
+    text_widget.grid(row=0, column=0, sticky=tk.NSEW)
 
     scrollbar_y.config(command=text_widget.yview)
     scrollbar_x.config(command=text_widget.xview)
+
+    # Configurar el sistema de rejilla del marco
+    frame_smells_detalle.grid_rowconfigure(0, weight=1)
+    frame_smells_detalle.grid_columnconfigure(0, weight=1)
 
     # Code Smells
     archivos = []
