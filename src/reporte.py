@@ -118,38 +118,45 @@ def ReporteTD_UI(project_dir):
     titulo.pack()
     for modulo in radon_por_modulo:
         if 20 > modulo.mi > 0:
-            low_mi = tk.Label(frame_low_mi, text=(modulo.file_name + ' - MI: ' + str(round(modulo.mi, 2)) + ', CC: ' +
-                                                  str(modulo.mi_params[1]) + ', %COM: ' + "%.2f%%" % modulo.mi_params[3] +
-                                                  ', LOC: ' + str(modulo.mi_params[2]) + ', HV: ' + str(
-                        round(modulo.mi_params[0], 2)))
-                              , font=("Arial", 13), background='white')
+            low_mi = tk.Label(frame_low_mi,
+                              text=(nombre_carpeta+'\\'+os.path.relpath(modulo.file_name, project_dir) + ' - MI: ' +
+                                    str(round(modulo.mi, 2)) + ', CC: ' + str(modulo.mi_params[1]) + ', %COM: ' +
+                                    "%.2f%%" % modulo.mi_params[3] + ', LOC: ' + str(modulo.mi_params[2]) + ', HV: ' +
+                                    str(round(modulo.mi_params[0], 2))),
+                              font=("Arial", 13), background='white')
             low_mi.pack()
             low_mi_encontrado = True
     if not low_mi_encontrado:
         not_found = tk.Label(frame_low_mi, text='-', font=("Arial", 13), background='white')
         not_found.pack()
-    #
-    #
-    #
-    #
-    #
-    #
 
-    grupo_2 = tk.Frame(ventana, background=background_color)
-    grupo_2.grid(row=3, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
+    # Frames smells
+    frame_smells_resumido = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
+    frame_smells_resumido.grid(row=3, column=0, padx=10, pady=10)
+
+    frame_smells_detalle = tk.Frame(ventana, background=background_color)
+    frame_smells_detalle.grid(row=4, column=0)
+
+    # Scrollbar total
+    scrollbar = tk.Scrollbar(ventana, orient=tk.VERTICAL)
+    scrollbar.grid(row = 0, column = 2)
 
     # Crear un widget de desplazamiento vertical
-    scrollbar = tk.Scrollbar(ventana)
-    scrollbar.grid(row=3, column=1, sticky=tk.N + tk.S)
+    scrollbar_y = tk.Scrollbar(frame_smells_detalle, orient=tk.VERTICAL)
+    scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
+
+    # Crear un widget de desplazamiento horizontal
+    scrollbar_x = tk.Scrollbar(frame_smells_detalle, orient=tk.HORIZONTAL)
+    scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
 
     # Crear un widget de texto para información de smells
-    text_widget = tk.Text(grupo_2, yscrollcommand=scrollbar.set)
-    text_widget.pack()
+    text_widget = tk.Text(frame_smells_detalle, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set, font=("Arial", 13), background='white')
+    text_widget.pack(fill=tk.BOTH, expand=True)
 
-    # Asociar la barra de desplazamiento al widget de texto
-    scrollbar.config(command=text_widget.yview)
+    scrollbar_y.config(command=text_widget.yview)
+    scrollbar_x.config(command=text_widget.xview)
 
-    # Code Smells (AST)
+    # Code Smells
     archivos = []
     for root, dirs, files in os.walk(project_dir):
         for file in files:
@@ -164,20 +171,26 @@ def ReporteTD_UI(project_dir):
         smells = file_smells['str']
         if smells:
             smells_array.append('')
-            smells_array.append("Detecciones en archivo: " + str(file))
+            smells_array.append("Archivo: " + str(file))
             for smell in smells:
                 smells_array.append(smell)
         for key, value in count.items():
             total_count[key] = total_count.get(key, 0) + value
 
+    # Contadores Smells
+
     if total_count:
-        text_widget.insert(tk.END, 'Total de smells encontrados:\n')
+        resumen_smells_titulo = tk.Label(frame_smells_resumido, text='Code Smells encontrados:', font=("Arial", 13),
+                                         background='white')
+        resumen_smells_titulo.pack()
         for key, value in total_count.items():
             if value > 0:
-                text_widget.insert(tk.END, key + ' - ' + str(value) + '\n')
+                smells_contador = tk.Label(frame_smells_resumido, text=(key + ' - ' + str(value)), font=("Arial", 13),
+                                           background='white')
+                smells_contador.pack()
 
     text_widget.insert(tk.END, '\n'.join(smells_array))
-
+    text_widget.config(state="disabled")
     ventana.mainloop()
 
 
