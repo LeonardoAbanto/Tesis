@@ -15,15 +15,18 @@ def ReporteTD_UI(project_dir):
 
     # Creación y configuración de ventana principal
     ventana = tk.Tk()
-    ventana.geometry("900x800")
+    ventana.minsize(400,400)
     ventana.title("Reporte de Deuda Técnica")
     ventana.configure(background=background_color)
-    ventana.grid_rowconfigure(0, weight=1)
-    ventana.grid_columnconfigure(0, weight=1)
+    ventana.grid_rowconfigure(1, weight=1)
+    ventana.grid_rowconfigure(2, weight=1)
+    ventana.grid_rowconfigure(3, weight=1)
+    ventana.grid_rowconfigure(4, weight=1)
+    # ventana.grid_columnconfigure(0, weight=1)
 
     # Frame 1
     frame_1 = tk.Frame(ventana, background=background_color)
-    frame_1.grid(row=1, column=0, sticky="w")
+    frame_1.grid(row=1, column=0, sticky="nw")
 
     # Frame Info Proyecto
     frame_info_proyecto = tk.Frame(frame_1, background='white', borderwidth=2, relief="solid")
@@ -113,7 +116,7 @@ def ReporteTD_UI(project_dir):
 
     # Frame Módulos MI
     frame_low_mi = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
-    frame_low_mi.grid(row=3, column=0, padx=10, pady=10, sticky="w")
+    frame_low_mi.grid(row=2, column=0, padx=10, pady=10, sticky="nw")
     # Módulos con bajo MI
     low_mi_encontrado = False
     titulo = tk.Label(frame_low_mi, text='Módulos con baja mantenibilidad identificados:',
@@ -122,10 +125,9 @@ def ReporteTD_UI(project_dir):
     for modulo in radon_por_modulo:
         if 20 > modulo.mi > 0:
             low_mi = tk.Label(frame_low_mi,
-                              text=(nombre_carpeta+'\\'+os.path.relpath(modulo.file_name, project_dir) + ' - MI: ' +
-                                    str(round(modulo.mi, 2)) + ', CC: ' + str(modulo.mi_params[1]) + ', %COM: ' +
-                                    "%.2f%%" % modulo.mi_params[3] + ', LOC: ' + str(modulo.mi_params[2]) + ', HV: ' +
-                                    str(round(modulo.mi_params[0], 2))),
+                              text=(nombre_carpeta+'\\'+os.path.relpath(modulo.file_name, project_dir) +
+                                    ' - MI: ' + str(round(modulo.mi, 2)) + ', Líneas de Código: '
+                                    + str(modulo.mi_params[2])),
                               font=("Arial", 13), background='white')
             low_mi.grid(sticky="w")
             low_mi_encontrado = True
@@ -135,10 +137,10 @@ def ReporteTD_UI(project_dir):
 
     # Frames smells
     frame_smells_resumido = tk.Frame(ventana, background='white', borderwidth=2, relief="solid")
-    frame_smells_resumido.grid(row=4, column=0, padx=10, pady=10, sticky="w")
+    frame_smells_resumido.grid(row=3, column=0, padx=10, pady=10, sticky="nw")
 
     frame_smells_detalle = tk.Frame(ventana, background=background_color)
-    frame_smells_detalle.grid(row=5, column=0, padx=10, pady=10, sticky="w")
+    frame_smells_detalle.grid(row=4, column=0, padx=10, pady=10, sticky="nw")
 
     # Crear un widget de desplazamiento vertical
     scrollbar_y = tk.Scrollbar(frame_smells_detalle, orient=tk.VERTICAL)
@@ -150,15 +152,20 @@ def ReporteTD_UI(project_dir):
 
     # Crear un widget de texto para información de smells
     text_widget = tk.Text(frame_smells_detalle, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set,
-                          font=("Arial", 13), background='white', width=300)
-    text_widget.grid(row=0, column=0, sticky=tk.NSEW)
+                          font=("Arial", 13), background='white', width=70, height=10)
+    text_widget.grid(row=0, column=0, sticky="nsew")
+
+    frame_smells_detalle.grid_rowconfigure(0, weight=1)
+    frame_smells_detalle.grid_columnconfigure(0, weight=1)
 
     scrollbar_y.config(command=text_widget.yview)
     scrollbar_x.config(command=text_widget.xview)
 
     # Configurar el sistema de rejilla del marco
     frame_smells_detalle.grid_rowconfigure(0, weight=1)
+    frame_smells_detalle.grid_rowconfigure(1, weight=1)
     frame_smells_detalle.grid_columnconfigure(0, weight=1)
+    frame_smells_detalle.grid_columnconfigure(1, weight=1)
 
     # Code Smells
     archivos = []
@@ -174,10 +181,10 @@ def ReporteTD_UI(project_dir):
         count = file_smells['count']
         smells = file_smells['str']
         if smells:
-            smells_array.append('')
             smells_array.append("Archivo: " + str(file))
             for smell in smells:
                 smells_array.append(smell)
+            smells_array.append('')
         for key, value in count.items():
             total_count[key] = total_count.get(key, 0) + value
 
