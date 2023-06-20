@@ -111,7 +111,16 @@ def detectar_LBCL(visited: metricas_ast.MetricVisitor):
                      f"La clase '{cls['name']}' en la línea {cls['lineno']} tiene más de 3 clases base: ")
             faltan = len(cls['base_classes']) - 1
             for base in cls['base_classes']:
-                smell += str(base)
+                nombre_base = ''
+                if isinstance(base, ast.Name):
+                    nombre_base=base.id
+                elif isinstance(base, ast.Attribute):
+                    nombre_base=base.attr
+                elif isinstance(base, ast.Call):
+                    if isinstance(base.func, ast.Name):
+                        nombre_base=base.func.id
+                        # Si deseas obtener más infor
+                smell += nombre_base
                 if faltan > 0:
                     smell += ",  "
                 faltan -= 1
