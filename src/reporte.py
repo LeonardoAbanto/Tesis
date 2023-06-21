@@ -152,7 +152,7 @@ def ReporteTD_UI(project_dir):
 
     # Crear un widget de texto para información de smells
     text_widget = tk.Text(frame_smells_detalle, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set,
-                          font=("Arial", 13), background='white', width=70, height=10)
+                          font=("Arial", 13), background='white', width=70, height=10, wrap="none")
     text_widget.grid(row=0, column=0, sticky="nsew")
 
     frame_smells_detalle.grid_rowconfigure(0, weight=1)
